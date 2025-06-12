@@ -1,0 +1,41 @@
+.animated-card {
+  width: 280px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  user-select: none;
+  perspective: 1000px;
+}
+
+.animated-card img {
+  width: 100%;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.animated-card h3 {
+  color: #1e6f5c;
+  margin: 15px 0 8px;
+}
+
+.animated-card p {
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Glow + lift on hover */
+.animated-card:hover {
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.25),
+    0 0 20px rgba(0, 255, 150, 0.5);
+  transform: translateY(-15px) scale(1.05);
+}
+
+.animated-card:hover img {
+  transform: scale(1.1);
+}

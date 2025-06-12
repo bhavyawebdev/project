@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multi-Page Yoga Quiz – Yogami</title>
+  <style>
+    :root {
+      --bg-light: linear-gradient(135deg, #e0f7fa, #ffffff);
+      --bg-dark: linear-gradient(135deg, #121212, #1e1e1e);
+      --text-light: #222;
+      --text-dark: #f5f5f5;
+      --primary: #0077ff;
+      --accent: #00c6ff;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.4s, color 0.4s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .quiz-container {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s ease;
+    }
+
+    body.dark .quiz-container {
+      background: #222;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .question {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      background: #f1faff;
+      margin: 0.5rem 0;
+      padding: 0.8rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    body.dark label {
+      background: #333;
+    }
+
+    label:hover {
+      background: #cceeff;
+    }
+
+    input[type="radio"] {
+      margin-right: 0.5rem;
+      transform: scale(1.2);
+    }
+
+    button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(to right, var(--accent), var(--primary));
+      border: none;
+      border-radius: 0.75rem;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    .result-box {
+      margin-top: 1rem;
+      background: #d9f2ff;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      display: none;
+    }
+
+    body.dark .result-box {
+      background: #2a2a2a;
+      color: #cfefff;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      z-index: 999;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 500px) {
+      .quiz-container {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body class="light">
+  <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+  <div class="quiz-container">
+    <form id="multiQuizForm">
+      <!-- Step 1 -->
+      <div class="step active" id="step1">
+        <h2>1. What’s your goal with yoga?</h2>
+        <div class="question">
+          <label><input type="radio" name="goal" value="relax"> Relaxation</label>
+          <label><input type="radio" name="goal" value="strength"> Strength & Energy</label>
+          <label><input type="radio" name="goal" value="flex"> Flexibility</label>
+        </div>
+        <button type="button" onclick="nextStep(2)">Next</button>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" id="step2">
+        <h2>2. How intense do you want it?</h2>
+        <div class="question">
+          <label><input type="radio" name="intensity" value="low"> Gentle</label>
+          <label><input type="radio" name="intensity" value="medium"> Moderate</label>
+          <label><input type="radio" name="intensity" value="high"> Intense</label>
+        </div>
+        <button type="button" onclick="nextStep(3)">Next</button>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" id="step3">
+        <h2>3. What is your experience level?</h2>
+        <div class="question">
+          <label><input type="radio" name="level" value="beginner"> Beginner</label>
+          <label><input type="radio" name="level" value="intermediate"> Intermediate</label>
+          <label><input type="radio" name="level" value="advanced"> Advanced</label>
+        </div>
+        <button type="submit">Show Result</button>
+      </div>
+    </form>
+
+    <div id="resultBox" class="result-box"></div>
+  </div>
+
+  <script>
+    const steps = document.querySelectorAll('.step');
+    const resultBox = document.getElementById('resultBox');
+    const form = document.getElementById('multiQuizForm');
+    const body = document.body;
+
+    // Toggle dark mode
+    function toggleTheme() {
+      body.classList.toggle("dark");
+      localStorage.setItem("theme", body.classList.contains("dark") ? "dark" : "light");
+      updateThemeText();
+    }
+
+    function updateThemeText() {
+      document.querySelector('.theme-toggle').textContent = body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+
+    function nextStep(stepNumber) {
+      const currentStep = document.querySelector('.step.active');
+      const inputs = currentStep.querySelectorAll('input[type="radio"]');
+      const answered = [...inputs].some(input => input.checked);
+
+      if (!answered) {
+        alert("Please select an option.");
+        return;
+      }
+
+      currentStep.classList.remove('active');
+      document.getElementById(`step${stepNumber}`).classList.add('active');
+    }
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const goal = form.goal.value;
+      const intensity = form.intensity.value;
+      const level = form.level.value;
+
+      let result = "";
+
+      if (goal === "relax" && intensity === "low") {
+        result = "🧘 Try <strong>Yin Yoga</strong> or <strong>Restorative Yoga</strong>.";
+      } else if (goal === "strength" && intensity === "high") {
+        result = "🔥 You’ll enjoy <strong>Power Yoga</strong> or <strong>Ashtanga Yoga</strong>.";
+      } else if (goal === "flex") {
+        result = "🤸‍♀️ <strong>Vinyasa</strong> or <strong>Hatha Yoga</strong> are great for flexibility.";
+      } else {
+        result = "🌟 Try <strong>Vinyasa Flow</strong> – a balanced and dynamic yoga style.";
+      }
+
+      resultBox.innerHTML = result;
+      resultBox.style.display = "block";
+      localStorage.setItem("yogaQuizResult", result);
+
+      const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-magic-bell-glow-2853.mp3");
+      audio.play();
+    });
+
+    // Load saved theme + result
+    window.addEventListener("load", () => {
+      const theme = localStorage.getItem("theme");
+      if (theme === "dark") body.classList.add("dark");
+      updateThemeText();
+
+      const saved = localStorage.getItem("yogaQuizResult");
+      if (saved) {
+        resultBox.innerHTML = saved;
+        resultBox.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
